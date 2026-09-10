@@ -1,16 +1,18 @@
-import { router } from 'expo-router';
 import { Bell, Search } from 'lucide-react-native';
 import { ScrollView, Text, XStack, YStack } from 'tamagui';
 
 import { Card } from '@/design-system/components/Card';
 import { Pill } from '@/design-system/components/Pill';
-import { mockMuscleGroups } from '@/data/mockExercises';
+import { ScreenContainer } from '@/design-system/components/ScreenContainer';
+import { useMuscleGroups } from '@/hooks/useExercises';
 
 const EQUIPMENT_FILTERS = ['All Gear', 'Dumbbell', 'Barbell', 'Cable'];
 
 export default function TargetsScreen() {
+  const { data: muscleGroups = [] } = useMuscleGroups();
+
   return (
-    <ScrollView flex={1} backgroundColor="$surfaceCanvas">
+    <ScreenContainer>
       <YStack padding="$md" gap="$lg" paddingBottom="$3xl">
         <XStack justifyContent="space-between" alignItems="center">
           <YStack>
@@ -60,8 +62,11 @@ export default function TargetsScreen() {
         </YStack>
 
         <YStack gap="$md">
-          {mockMuscleGroups.map((group) => (
-            <Card key={group.slug} onPress={() => router.push(`/exercise/${group.slug}`)} padding="$md" gap="$sm">
+          {/* Not yet linked anywhere — a muscle-filtered exercise list screen
+              doesn't exist yet (Phase 1 scope is just wiring real data into
+              the existing screens), so these cards are informational only. */}
+          {muscleGroups.map((group) => (
+            <Card key={group.slug} padding="$md" gap="$sm">
               <XStack justifyContent="space-between" alignItems="flex-start">
                 <YStack flex={1} gap="$xs">
                   <Text color="$textPrimary" fontFamily="$body" fontSize="$titleLg" fontWeight="700" textTransform="capitalize">
@@ -82,6 +87,6 @@ export default function TargetsScreen() {
           ))}
         </YStack>
       </YStack>
-    </ScrollView>
+    </ScreenContainer>
   );
 }

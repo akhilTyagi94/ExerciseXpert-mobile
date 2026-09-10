@@ -1,9 +1,10 @@
 import { Bell, Play, Search } from 'lucide-react-native';
-import { ScrollView, Text, XStack, YStack } from 'tamagui';
+import { Text, XStack, YStack } from 'tamagui';
 
 import { Card } from '@/design-system/components/Card';
 import { Pill } from '@/design-system/components/Pill';
 import { PrimaryButton } from '@/design-system/components/PrimaryButton';
+import { ScreenContainer } from '@/design-system/components/ScreenContainer';
 import { SectionHeading } from '@/design-system/components/SectionHeading';
 
 // Mock content only — routine building, saved favorites, and PR tracking are
@@ -27,7 +28,7 @@ const ROUTINE_BUILDER = [
 
 export default function RoutinesScreen() {
   return (
-    <ScrollView flex={1} backgroundColor="$surfaceCanvas">
+    <ScreenContainer>
       <YStack padding="$md" gap="$lg" paddingBottom="$3xl">
         <XStack justifyContent="space-between" alignItems="center">
           <YStack>
@@ -122,6 +123,6 @@ export default function RoutinesScreen() {
           ))}
         </YStack>
       </YStack>
-    </ScrollView>
+    </ScreenContainer>
   );
 }

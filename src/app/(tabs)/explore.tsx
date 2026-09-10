@@ -5,14 +5,17 @@ import { ScrollView, Text, View, XStack, YStack } from 'tamagui';
 import { PrimaryButton } from '@/design-system/components/PrimaryButton';
 import { ExerciseCard } from '@/design-system/components/ExerciseCard';
 import { Pill } from '@/design-system/components/Pill';
+import { ScreenContainer } from '@/design-system/components/ScreenContainer';
 import { SectionHeading } from '@/design-system/components/SectionHeading';
-import { mockExercises } from '@/data/mockExercises';
+import { useExercises } from '@/hooks/useExercises';
 
 const TARGET_FOCUS_CHIPS = ['All (1,348)', 'Chest', 'Back', 'Legs', 'Arms'];
 
 export default function ExploreScreen() {
+  const { data: exercises = [] } = useExercises();
+
   return (
-    <ScrollView flex={1} backgroundColor="$surfaceCanvas">
+    <ScreenContainer>
       <YStack padding="$md" gap="$lg" paddingBottom="$3xl">
         <XStack justifyContent="space-between" alignItems="center">
           <XStack alignItems="center" gap="$xs">
@@ -95,9 +98,9 @@ export default function ExploreScreen() {
         </YStack>
 
         <YStack gap="$md">
-          <SectionHeading eyebrow="4 Available · Auto-synced" title="Featured Movements" />
+          <SectionHeading eyebrow={`${exercises.length} Available · Auto-synced`} title="Featured Movements" />
           <YStack gap="$md">
-            {mockExercises.map((exercise) => (
+            {exercises.map((exercise) => (
               <ExerciseCard
                 key={exercise.id}
                 exercise={exercise}
@@ -107,6 +110,6 @@ export default function ExploreScreen() {
           </YStack>
         </YStack>
       </YStack>
-    </ScrollView>
+    </ScreenContainer>
   );
 }

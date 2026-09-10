@@ -7,12 +7,18 @@ const size = {
   true: spacing.md,
 } as const;
 
+// Tamagui requires every numeric token category (size/space/radius/zIndex)
+// to share at least some key names with `size` — it's designed around one
+// reused key scheme, not category-specific names. `floating`/`overlay`/
+// `modal` below are just labeled tiers on the same xs..xl scale.
+const zIndex = { xs: 0, sm: 1, md: 10, lg: 90, xl: 100, true: 10 } as const;
+
 const tokens = createTokens({
   color: colors,
   space: { ...size, 0: 0 },
   size,
   radius: { ...radii, 0: 0 },
-  zIndex: { modal: 100, overlay: 90, floating: 10 },
+  zIndex,
 });
 
 // Inter, weighted per design_system.md's named scale rather than Tamagui's

@@ -1,23 +1,51 @@
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { Bookmark, ChevronLeft, ShieldAlert } from 'lucide-react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { ScrollView, Text, XStack, YStack } from 'tamagui';
 
 import { Card } from '@/design-system/components/Card';
 import { ExerciseCard } from '@/design-system/components/ExerciseCard';
 import { Pill } from '@/design-system/components/Pill';
 import { PrimaryButton } from '@/design-system/components/PrimaryButton';
+import { ScreenContainer } from '@/design-system/components/ScreenContainer';
 import { SectionHeading } from '@/design-system/components/SectionHeading';
-import { mockExerciseDetail } from '@/data/mockExercises';
+import { useExercise } from '@/hooks/useExercises';
+import { useExerciseVideos } from '@/hooks/useExerciseVideos';
 
-// Always renders the one mock exercise regardless of :slug — there is no
-// backend to query yet (see ingestion/ and supabase/migrations/). Swap this
-// for a TanStack Query `useExercise(slug)` hook once the API layer exists.
 export default function ExerciseDetailScreen() {
-  const exercise = mockExerciseDetail;
+  const { slug } = useLocalSearchParams<{ slug: string }>();
+  const { data: exercise, isPending } = useExercise(slug);
+  const { data: videos = [] } = useExerciseVideos(exercise?.name);
+
+  if (isPending) {
+    return (
+      <SafeAreaView style={{ flex: 1, backgroundColor: '#0B0F19' }} edges={['top']}>
+        <YStack flex={1} backgroundColor="$surfaceCanvas" alignItems="center" justifyContent="center">
+          <Text color="$placeholderColor" fontFamily="$body" fontSize="$bodyBase">
+            Loading exercise...
+          </Text>
+        </YStack>
+      </SafeAreaView>
+    );
+  }
+
+  if (!exercise) {
+    return (
+      <SafeAreaView style={{ flex: 1, backgroundColor: '#0B0F19' }} edges={['top']}>
+        <YStack flex={1} backgroundColor="$surfaceCanvas" alignItems="center" justifyContent="center" gap="$sm" padding="$xl">
+          <Text color="$textPrimary" fontFamily="$body" fontSize="$titleLg" fontWeight="700">
+            Exercise not found
+          </Text>
+          <ChevronLeft size={22} color="#F8FAFC" onPress={() => router.back()} />
+        </YStack>
+      </SafeAreaView>
+    );
+  }
+
   const [primaryMuscle, ...secondaryMuscles] = exercise.muscles;
 
   return (
-    <ScrollView flex={1} backgroundColor="$surfaceCanvas">
+    <ScreenContainer>
       <YStack padding="$md" gap="$lg" paddingBottom="$3xl">
         <XStack justifyContent="space-between" alignItems="center">
           <ChevronLeft size={22} color="#F8FAFC" onPress={() => router.back()} />
@@ -42,7 +70,7 @@ export default function ExerciseDetailScreen() {
             TARGET ANATOMY & APPARATUS
           </Text>
           <XStack gap="$xs" flexWrap="wrap">
-            <Pill label={primaryMuscle.name} variant="muscle" />
+            {primaryMuscle ? <Pill label={primaryMuscle.name} variant="muscle" /> : null}
             {secondaryMuscles.length > 0 ? (
               <Pill label={secondaryMuscles.map((m) => m.name).join(', ')} variant="target" />
             ) : null}
@@ -89,8 +117,33 @@ export default function ExerciseDetailScreen() {
           </Text>
         </Card>
 
+        {videos.length > 0 ? (
+          <YStack gap="$md">
+            <SectionHeading eyebrow="YouTube" title="Technique Videos" />
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              <XStack gap="$md">
+                {videos.map((video) => (
+                  <Card key={video.videoId} width={220} padding="$sm" gap="$xs">
+                    <Text color="$textPrimary" fontFamily="$body" fontSize="$bodyBold" fontWeight="600" numberOfLines={2}>
+                      {video.title}
+                    </Text>
+                    {video.channelName ? (
+                      <Text color="$placeholderColor" fontFamily="$body" fontSize="$caption">
+                        {video.channelName}
+                      </Text>
+                    ) : null}
+                  </Card>
+                ))}
+              </XStack>
+            </ScrollView>
+          </YStack>
+        ) : null}
+
         <YStack gap="$md">
-          <SectionHeading eyebrow="RapidAPI Exercise DB" title="Related Chest Drills" />
+          <SectionHeading
+            eyebrow="Related"
+            title={primaryMuscle ? `More ${primaryMuscle.name} Exercises` : 'Related Exercises'}
+          />
           <YStack gap="$md">
             {exercise.relatedExercises.map((related) => (
               <ExerciseCard key={related.id} exercise={related} onPress={() => router.push(`/exercise/${related.slug}`)} />
@@ -100,6 +153,6 @@ export default function ExerciseDetailScreen() {
 
         <PrimaryButton label="Log Sets & Timer" />
       </YStack>
-    </ScrollView>
+    </ScreenContainer>
   );
 }
