@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import WebSocket from 'ws';
 
 import { ExerciseDbAdapter } from './adapters/exerciseDbAdapter';
 import type { CanonicalExercise, ExerciseSourceAdapter } from './adapters/types';
@@ -94,7 +95,11 @@ async function runAdapter(supabase: SupabaseClient, adapter: ExerciseSourceAdapt
 }
 
 async function main() {
-  const supabase = createClient<any>(requireEnv('SUPABASE_URL'), requireEnv('SUPABASE_SERVICE_ROLE_KEY'));
+  // Node 20 has no native WebSocket; supabase-js needs one for its realtime
+  // client even though ingestion never uses realtime subscriptions.
+  const supabase = createClient<any>(requireEnv('SUPABASE_URL'), requireEnv('SUPABASE_SERVICE_ROLE_KEY'), {
+    realtime: { transport: WebSocket as any },
+  });
   const adapters: ExerciseSourceAdapter[] = [new ExerciseDbAdapter(requireEnv('RAPIDAPI_KEY'))];
 
   for (const adapter of adapters) {

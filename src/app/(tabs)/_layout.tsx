@@ -9,7 +9,7 @@ import { colors } from '@/design-system/tokens';
 export default function TabsLayout() {
   return (
     <NativeTabs backgroundColor={colors.surfaceCanvas} tintColor={colors.primary} labelStyle={{ selected: { color: colors.primary } }}>
-      <NativeTabs.Trigger name="explore">
+      <NativeTabs.Trigger name="index">
         <NativeTabs.Trigger.Label>Explore</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon sf="flame.fill" md="local_fire_department" />
       </NativeTabs.Trigger>
