@@ -1,10 +1,11 @@
-import { Bell, Play, Search } from 'lucide-react-native';
+import { Play } from 'lucide-react-native';
 import { Text, XStack, YStack } from 'tamagui';
 
 import { Card } from '@/design-system/components/Card';
 import { Pill } from '@/design-system/components/Pill';
 import { PrimaryButton } from '@/design-system/components/PrimaryButton';
 import { ScreenContainer } from '@/design-system/components/ScreenContainer';
+import { ScreenHeader } from '@/design-system/components/ScreenHeader';
 import { SectionHeading } from '@/design-system/components/SectionHeading';
 
 // Mock content only — routine building, saved favorites, and PR tracking are
@@ -30,20 +31,7 @@ export default function RoutinesScreen() {
   return (
     <ScreenContainer>
       <YStack padding="$md" gap="$lg" paddingBottom="$3xl">
-        <XStack justifyContent="space-between" alignItems="center">
-          <YStack>
-            <Text color="$primary" fontFamily="$body" fontSize="$labelCaps" fontWeight="800">
-              EXERCISEXPERT
-            </Text>
-            <Text color="$textPrimary" fontFamily="$body" fontSize="$titleLg" fontWeight="700">
-              Routines
-            </Text>
-          </YStack>
-          <XStack alignItems="center" gap="$md">
-            <Search size={20} color="#F8FAFC" />
-            <Bell size={20} color="#F8FAFC" />
-          </XStack>
-        </XStack>
+        <ScreenHeader title="Routines" />
 
         <Card padding="$md" flexDirection="row" justifyContent="space-between" alignItems="center">
           <YStack>

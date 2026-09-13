@@ -32,6 +32,26 @@ const EXERCISE_SELECT = `
   exercise_media ( media_type, cdn_url, source_url )
 `;
 
+// `!inner` turns the embedded resource into an inner join, which is what
+// lets a `.eq()` on its nested column actually filter the top-level
+// `exercises` rows — without it, PostgREST left-joins the embed and the
+// filter is silently ignored. Kept as separate select strings (rather than
+// applying `!inner` to EXERCISE_SELECT itself) since normal fetches must
+// still return exercises with no muscles/equipment recorded.
+const EXERCISE_SELECT_MUSCLE_FILTER = `
+  id, slug, name, difficulty, instructions,
+  exercise_muscles!inner ( role, muscle_groups!inner ( slug, name ) ),
+  exercise_equipment ( equipment ( slug, name ) ),
+  exercise_media ( media_type, cdn_url, source_url )
+`;
+
+const EXERCISE_SELECT_EQUIPMENT_FILTER = `
+  id, slug, name, difficulty, instructions,
+  exercise_muscles ( role, muscle_groups ( slug, name ) ),
+  exercise_equipment!inner ( equipment!inner ( slug, name ) ),
+  exercise_media ( media_type, cdn_url, source_url )
+`;
+
 function toMuscles(row: RawExerciseRow): Muscle[] {
   return row.exercise_muscles.map((m) => ({
     slug: m.muscle_groups.slug,
@@ -73,6 +93,52 @@ export async function fetchExercises(): Promise<ExerciseSummary[]> {
   const { data, error } = await supabase!.from('exercises').select(EXERCISE_SELECT).limit(50);
   if (error) throw error;
   return (data as unknown as RawExerciseRow[]).map(toSummary);
+}
+
+export async function searchExercises(query: string): Promise<ExerciseSummary[]> {
+  if (!isSupabaseConfigured) {
+    return mockExercises.filter((exercise) => exercise.name.toLowerCase().includes(query.toLowerCase()));
+  }
+
+  const { data, error } = await supabase!.from('exercises').select(EXERCISE_SELECT).ilike('name', `%${query}%`).limit(50);
+  if (error) throw error;
+  return (data as unknown as RawExerciseRow[]).map(toSummary);
+}
+
+export async function fetchExercisesByMuscle(muscleSlug: string): Promise<ExerciseSummary[]> {
+  if (!isSupabaseConfigured) {
+    return mockExercises.filter((exercise) => exercise.muscles.some((muscle) => muscle.slug === muscleSlug));
+  }
+
+  const { data, error } = await supabase!
+    .from('exercises')
+    .select(EXERCISE_SELECT_MUSCLE_FILTER)
+    .eq('exercise_muscles.muscle_groups.slug', muscleSlug)
+    .limit(50);
+  if (error) throw error;
+  return (data as unknown as RawExerciseRow[]).map(toSummary);
+}
+
+export async function fetchExercisesByEquipment(equipmentSlug: string): Promise<ExerciseSummary[]> {
+  if (!isSupabaseConfigured) {
+    return mockExercises.filter((exercise) => exercise.equipment.some((item) => item.slug === equipmentSlug));
+  }
+
+  const { data, error } = await supabase!
+    .from('exercises')
+    .select(EXERCISE_SELECT_EQUIPMENT_FILTER)
+    .eq('exercise_equipment.equipment.slug', equipmentSlug)
+    .limit(50);
+  if (error) throw error;
+  return (data as unknown as RawExerciseRow[]).map(toSummary);
+}
+
+export async function fetchExerciseCount(): Promise<number> {
+  if (!isSupabaseConfigured) return mockExercises.length;
+
+  const { count, error } = await supabase!.from('exercises').select('*', { count: 'exact', head: true });
+  if (error) throw error;
+  return count ?? 0;
 }
 
 export async function fetchExerciseBySlug(slug: string): Promise<ExerciseDetail | null> {

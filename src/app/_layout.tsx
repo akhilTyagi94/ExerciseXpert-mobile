@@ -41,6 +41,7 @@ export default function RootLayout() {
         <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.surfaceCanvas } }}>
           <Stack.Screen name="(tabs)" />
           <Stack.Screen name="exercise/[slug]" options={{ presentation: 'card' }} />
+          <Stack.Screen name="exercise-list" options={{ presentation: 'card' }} />
           <Stack.Screen name="profile" options={{ presentation: 'modal' }} />
           <Stack.Screen name="auth" options={{ presentation: 'modal' }} />
           <Stack.Screen name="paywall" options={{ presentation: 'modal' }} />

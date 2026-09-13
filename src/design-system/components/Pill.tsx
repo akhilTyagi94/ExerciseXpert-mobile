@@ -9,10 +9,18 @@ const VARIANT_STYLES: Record<PillVariant, { bg: string; color: string }> = {
   active: { bg: '$primary', color: '$white' },
 };
 
-export function Pill({ label, variant = 'neutral' }: { label: string; variant?: PillVariant }) {
+export function Pill({
+  label,
+  variant = 'neutral',
+  onPress,
+}: {
+  label: string;
+  variant?: PillVariant;
+  onPress?: () => void;
+}) {
   const { bg, color } = VARIANT_STYLES[variant];
   return (
-    <XStack backgroundColor={bg} borderRadius="$full" paddingHorizontal="$md" paddingVertical="$xs">
+    <XStack backgroundColor={bg} borderRadius="$full" paddingHorizontal="$md" paddingVertical="$xs" onPress={onPress}>
       <Text color={color} fontFamily="$body" fontSize="$tagPill" lineHeight="$tagPill" fontWeight="700">
         {label}
       </Text>

@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import { Bell, Search, SlidersHorizontal } from 'lucide-react-native';
+import { Search } from 'lucide-react-native';
 import { ScrollView, Text, View, XStack, YStack } from 'tamagui';
 
 import { AdBanner } from '@/design-system/components/AdBanner';
@@ -7,13 +7,19 @@ import { PrimaryButton } from '@/design-system/components/PrimaryButton';
 import { ExerciseCard } from '@/design-system/components/ExerciseCard';
 import { Pill } from '@/design-system/components/Pill';
 import { ScreenContainer } from '@/design-system/components/ScreenContainer';
+import { ScreenHeader } from '@/design-system/components/ScreenHeader';
 import { SectionHeading } from '@/design-system/components/SectionHeading';
-import { useExercises } from '@/hooks/useExercises';
-
-const TARGET_FOCUS_CHIPS = ['All (1,348)', 'Chest', 'Back', 'Legs', 'Arms'];
+import { useExerciseCount, useExercises, useMuscleGroups } from '@/hooks/useExercises';
 
 export default function ExploreScreen() {
   const { data: exercises = [] } = useExercises();
+  const { data: totalCount = 0 } = useExerciseCount();
+  const { data: muscleGroups = [] } = useMuscleGroups();
+  const topMuscleGroups = muscleGroups.slice(0, 4);
+
+  function openMuscleFilter(slug: string, name: string) {
+    router.push({ pathname: '/exercise-list', params: { muscle: slug, title: name } });
+  }
 
   return (
     <ScreenContainer>
@@ -24,24 +30,7 @@ export default function ExploreScreen() {
             then rather than building a bespoke overlay for a placeholder. */}
         <AdBanner />
 
-        <XStack justifyContent="space-between" alignItems="center">
-          <XStack alignItems="center" gap="$xs">
-            <Text color="$primary" fontFamily="$body" fontSize="$labelCaps" fontWeight="800">
-              EXERCISEXPERT
-            </Text>
-          </XStack>
-          <XStack alignItems="center" gap="$md">
-            <Search size={20} color="#F8FAFC" />
-            <Bell size={20} color="#F8FAFC" />
-            <View
-              onPress={() => router.push('/profile')}
-              width={32}
-              height={32}
-              borderRadius="$full"
-              backgroundColor="$surfaceElevated"
-            />
-          </XStack>
-        </XStack>
+        <ScreenHeader />
 
         <YStack gap="$xs">
           <XStack alignItems="center" gap="$xs">
@@ -66,12 +55,12 @@ export default function ExploreScreen() {
           borderColor="$border"
           alignItems="center"
           paddingHorizontal="$md"
-          gap="$sm">
+          gap="$sm"
+          onPress={() => router.push({ pathname: '/exercise-list', params: { mode: 'search' } })}>
           <Search size={18} color="#64748B" />
           <Text flex={1} color="$placeholderColor" fontFamily="$body" fontSize="$bodyBase">
-            Search 1,300+ exercises...
+            Search {totalCount || '1,300'}+ exercises...
           </Text>
-          <SlidersHorizontal size={18} color="#F8FAFC" />
         </XStack>
 
         <YStack gap="$sm">
@@ -80,8 +69,18 @@ export default function ExploreScreen() {
           </Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             <XStack gap="$sm">
-              {TARGET_FOCUS_CHIPS.map((chip, index) => (
-                <Pill key={chip} label={chip} variant={index === 0 ? 'active' : 'neutral'} />
+              <Pill
+                label={`All (${totalCount})`}
+                variant="active"
+                onPress={() => router.push({ pathname: '/exercise-list', params: { title: 'All Exercises' } })}
+              />
+              {topMuscleGroups.map((group) => (
+                <Pill
+                  key={group.slug}
+                  label={group.name}
+                  variant="neutral"
+                  onPress={() => openMuscleFilter(group.slug, group.name)}
+                />
               ))}
             </XStack>
           </ScrollView>

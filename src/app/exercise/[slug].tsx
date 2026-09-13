@@ -1,4 +1,5 @@
 import { router, useLocalSearchParams } from 'expo-router';
+import { Image } from 'expo-image';
 import { Bookmark, ChevronLeft, ShieldAlert } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ScrollView, Text, XStack, YStack } from 'tamagui';
@@ -56,14 +57,18 @@ export default function ExerciseDetailScreen() {
           <Bookmark size={20} color="#F8FAFC" />
         </XStack>
 
-        {/* Real build needs the "animated workout canvas" (looping video +
-            angle/speed scrubber) described in design_system.md — placeholder
-            here stands in for it, see § Mobile app architecture / Media
-            rendering in the proposal for the expo-video approach. */}
-        <Card height={260} alignItems="center" justifyContent="center" gap="$sm">
-          <Text color="$placeholderColor" fontFamily="$body" fontSize="$bodyBase">
-            Exercise media (looping video, angle/speed controls)
-          </Text>
+        {/* Static poster/GIF for now — the "animated workout canvas" (looping
+            video + angle/speed scrubber) described in design_system.md needs
+            expo-video and is a separate build, see § Mobile app architecture
+            / Media rendering in the proposal. */}
+        <Card height={260} alignItems="center" justifyContent="center" overflow="hidden">
+          {exercise.media.posterUrl ? (
+            <Image source={{ uri: exercise.media.posterUrl }} style={{ width: '100%', height: '100%' }} contentFit="cover" />
+          ) : (
+            <Text color="$placeholderColor" fontFamily="$body" fontSize="$bodyBase">
+              No media available for this exercise.
+            </Text>
+          )}
         </Card>
 
         <YStack gap="$sm">
