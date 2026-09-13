@@ -1,6 +1,7 @@
 import { Bell, Search } from 'lucide-react-native';
 import { ScrollView, Text, XStack, YStack } from 'tamagui';
 
+import { AdBanner } from '@/design-system/components/AdBanner';
 import { Card } from '@/design-system/components/Card';
 import { Pill } from '@/design-system/components/Pill';
 import { ScreenContainer } from '@/design-system/components/ScreenContainer';
@@ -14,6 +15,8 @@ export default function TargetsScreen() {
   return (
     <ScreenContainer>
       <YStack padding="$md" gap="$lg" paddingBottom="$3xl">
+        <AdBanner />
+
         <XStack justifyContent="space-between" alignItems="center">
           <YStack>
             <Text color="$primary" fontFamily="$body" fontSize="$labelCaps" fontWeight="800">

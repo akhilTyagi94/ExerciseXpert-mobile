@@ -2,6 +2,7 @@ import { router } from 'expo-router';
 import { Bell, Search, SlidersHorizontal } from 'lucide-react-native';
 import { ScrollView, Text, View, XStack, YStack } from 'tamagui';
 
+import { AdBanner } from '@/design-system/components/AdBanner';
 import { PrimaryButton } from '@/design-system/components/PrimaryButton';
 import { ExerciseCard } from '@/design-system/components/ExerciseCard';
 import { Pill } from '@/design-system/components/Pill';
@@ -17,6 +18,12 @@ export default function ExploreScreen() {
   return (
     <ScreenContainer>
       <YStack padding="$md" gap="$lg" paddingBottom="$3xl">
+        {/* Not pinned to the viewport edge yet — the real AdMob SDK renders
+            its own native banner view once wired, which has a different
+            anchoring model than a JS sticky overlay, so revisit positioning
+            then rather than building a bespoke overlay for a placeholder. */}
+        <AdBanner />
+
         <XStack justifyContent="space-between" alignItems="center">
           <XStack alignItems="center" gap="$xs">
             <Text color="$primary" fontFamily="$body" fontSize="$labelCaps" fontWeight="800">

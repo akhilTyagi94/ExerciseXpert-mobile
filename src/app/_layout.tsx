@@ -43,6 +43,7 @@ export default function RootLayout() {
           <Stack.Screen name="exercise/[slug]" options={{ presentation: 'card' }} />
           <Stack.Screen name="profile" options={{ presentation: 'modal' }} />
           <Stack.Screen name="auth" options={{ presentation: 'modal' }} />
+          <Stack.Screen name="paywall" options={{ presentation: 'modal' }} />
         </Stack>
       </TamaguiProvider>
     </QueryClientProvider>
