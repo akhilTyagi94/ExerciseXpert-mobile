@@ -33,6 +33,25 @@ function slugify(value: string): string {
     .replace(/(^-|-$)/g, '');
 }
 
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+// The free tier enforces an undocumented rate limit — pulling all ~15 pages
+// back-to-back reliably triggers a 429 partway through. Retries with backoff
+// rather than failing the whole ingestion run over a transient throttle.
+async function fetchWithRetry(url: URL, maxAttempts = 5): Promise<Response> {
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    const response = await fetch(url);
+    if (response.status !== 429) return response;
+    if (attempt === maxAttempts) return response;
+    const retryAfterSeconds = Number(response.headers.get('retry-after'));
+    const delayMs = Number.isFinite(retryAfterSeconds) && retryAfterSeconds > 0 ? retryAfterSeconds * 1000 : attempt * 2000;
+    await sleep(delayMs);
+  }
+  throw new Error('unreachable');
+}
+
 export class ExerciseDbV1Adapter implements ExerciseSourceAdapter {
   readonly providerName = 'exercisedb-v1';
 
@@ -45,7 +64,7 @@ export class ExerciseDbV1Adapter implements ExerciseSourceAdapter {
       url.searchParams.set('limit', String(PAGE_SIZE));
       if (cursor) url.searchParams.set('after', cursor);
 
-      const response = await fetch(url);
+      const response = await fetchWithRetry(url);
       if (!response.ok) {
         throw new Error(`ExerciseDB v1 request failed: ${response.status} ${response.statusText}`);
       }
@@ -55,6 +74,7 @@ export class ExerciseDbV1Adapter implements ExerciseSourceAdapter {
 
       if (!page.meta.hasNextPage || !page.meta.nextCursor) break;
       cursor = page.meta.nextCursor;
+      await sleep(500);
     }
 
     return results;
