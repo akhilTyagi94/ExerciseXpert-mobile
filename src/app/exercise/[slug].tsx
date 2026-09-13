@@ -11,6 +11,7 @@ import { ScreenContainer } from '@/design-system/components/ScreenContainer';
 import { SectionHeading } from '@/design-system/components/SectionHeading';
 import { useExercise } from '@/hooks/useExercises';
 import { useExerciseVideos } from '@/hooks/useExerciseVideos';
+import { goBack } from '@/utils/navigation';
 
 export default function ExerciseDetailScreen() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
@@ -36,7 +37,7 @@ export default function ExerciseDetailScreen() {
           <Text color="$textPrimary" fontFamily="$body" fontSize="$titleLg" fontWeight="700">
             Exercise not found
           </Text>
-          <ChevronLeft size={22} color="#F8FAFC" onPress={() => router.back()} />
+          <ChevronLeft size={22} color="#F8FAFC" onPress={goBack} />
         </YStack>
       </SafeAreaView>
     );
@@ -48,7 +49,7 @@ export default function ExerciseDetailScreen() {
     <ScreenContainer>
       <YStack padding="$md" gap="$lg" paddingBottom="$3xl">
         <XStack justifyContent="space-between" alignItems="center">
-          <ChevronLeft size={22} color="#F8FAFC" onPress={() => router.back()} />
+          <ChevronLeft size={22} color="#F8FAFC" onPress={goBack} />
           <Text color="$textPrimary" fontFamily="$body" fontSize="$titleLg" fontWeight="700">
             Exercise Detail
           </Text>

@@ -1,8 +1,11 @@
+import { router } from 'expo-router';
 import { Image } from 'expo-image';
 import { Heart, Play } from 'lucide-react-native';
 import { Text, XStack, YStack } from 'tamagui';
 
 import type { ExerciseSummary } from '@/domain/exercise';
+import { useAuth } from '@/hooks/useAuth';
+import { useFavoriteIds, useToggleFavorite } from '@/hooks/useFavorites';
 
 import { Card } from './Card';
 import { Pill } from './Pill';
@@ -15,6 +18,18 @@ export function ExerciseCard({
   onPress?: () => void;
 }) {
   const [primaryMuscle, ...secondaryMuscles] = exercise.muscles;
+  const { isSignedIn } = useAuth();
+  const { data: favoriteIds } = useFavoriteIds();
+  const toggleFavorite = useToggleFavorite();
+  const isFavorited = favoriteIds?.has(exercise.id) ?? false;
+
+  function handleFavoritePress() {
+    if (!isSignedIn) {
+      router.push('/auth');
+      return;
+    }
+    toggleFavorite.mutate({ exercise, isFavorited });
+  }
 
   return (
     <Card accented onPress={onPress} pressStyle={{ scale: 0.98 }}>
@@ -37,8 +52,9 @@ export function ExerciseCard({
           backgroundColor="$surfaceCanvas"
           opacity={0.85}
           alignItems="center"
-          justifyContent="center">
-          <Heart size={18} color="#F8FAFC" />
+          justifyContent="center"
+          onPress={handleFavoritePress}>
+          <Heart size={18} color={isFavorited ? '#FF2625' : '#F8FAFC'} fill={isFavorited ? '#FF2625' : 'transparent'} />
         </XStack>
       </YStack>
 

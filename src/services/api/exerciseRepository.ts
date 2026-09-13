@@ -104,6 +104,15 @@ export async function fetchExerciseBySlug(slug: string): Promise<ExerciseDetail 
   };
 }
 
+export async function fetchFavoriteExercises(userId: string): Promise<ExerciseSummary[]> {
+  const { data, error } = await supabase!
+    .from('favorites')
+    .select(`exercises:exercise_id ( ${EXERCISE_SELECT} )`)
+    .eq('user_id', userId);
+  if (error) throw error;
+  return ((data ?? []) as unknown as { exercises: RawExerciseRow }[]).map((row) => toSummary(row.exercises));
+}
+
 export async function fetchMuscleGroupSections(): Promise<MuscleGroupSection[]> {
   if (!isSupabaseConfigured) return mockMuscleGroups;
 

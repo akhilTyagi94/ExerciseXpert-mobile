@@ -15,8 +15,10 @@ import { AnimatedSplashOverlay } from '@/components/animated-icon';
 import { tamaguiConfig } from '@/design-system/tamagui.config';
 import { colors } from '@/design-system/tokens';
 import { queryClient } from '@/services/api/queryClient';
+import { initAuthListener } from '@/state/authStore';
 
 SplashScreen.preventAutoHideAsync();
+initAuthListener();
 
 // The product is dark-only by design (see tamagui.config.ts) — there is no
 // designed light mode, so the app always renders the "dark" Tamagui theme
@@ -40,6 +42,7 @@ export default function RootLayout() {
           <Stack.Screen name="(tabs)" />
           <Stack.Screen name="exercise/[slug]" options={{ presentation: 'card' }} />
           <Stack.Screen name="profile" options={{ presentation: 'modal' }} />
+          <Stack.Screen name="auth" options={{ presentation: 'modal' }} />
         </Stack>
       </TamaguiProvider>
     </QueryClientProvider>
